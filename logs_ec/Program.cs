@@ -44,9 +44,15 @@ namespace logs_ec
                         validador_envios_prueba va = ea.getValidadorEnviosPrueba(en[i].id_persona_juridica);
                         if (va.cantidad_dominios_test < cantidad_envios_prueba_isc && va.cantidad_no_dominios_test < cantidad_envios_prueba_externos && va.envios_activos == 0)
                         {
-                            generarEnvio(en[i].id_envio, 0);
-                            ea.ActualizarEnvioGatilladoTest(en[i].id_envio, 1);
-                            logger.Info($"[Main] GenerarEnvio => Gatillada la prueba => Idenvio: {en[i].id_envio} IdEstadoEnvio:{en[i].id_estado_envio}");
+                            if (generarEnvio(en[i].id_envio, 0))
+                            {
+                                ea.ActualizarEnvioGatilladoTest(en[i].id_envio, 1);
+                                logger.Info($"[Main] GenerarEnvio => Gatillada la prueba => Idenvio: {en[i].id_envio} IdEstadoEnvio:{en[i].id_estado_envio}");
+                            }
+                            else
+                            {
+                                logger.Info($"[Main] GenerarEnvio => No se generó la prueba => Idenvio: {en[i].id_envio} IdEstadoEnvio:{en[i].id_estado_envio}");
+                            }
                         }
                     }
 
@@ -54,17 +60,29 @@ namespace logs_ec
                     {
                         if (en[i].programado == 0 || (en[i].programado == 1 && en[i].fecha_programado <= DateTime.Now))
                         {
-                            generarEnvio(en[i].id_envio, 1);
-                            ea.ActualizarEnvioGatillado(en[i].id_envio, 1);
-                            logger.Info($"[Main] GenerarEnvio => Gatillado el envio automatico => Idenvio: {en[i].id_envio} IdEstadoEnvio:{en[i].id_estado_envio}");
+                            if (generarEnvio(en[i].id_envio, 1))
+                            {
+                                ea.ActualizarEnvioGatillado(en[i].id_envio, 1);
+                                logger.Info($"[Main] GenerarEnvio => Gatillado el envio automatico => Idenvio: {en[i].id_envio} IdEstadoEnvio:{en[i].id_estado_envio}");
+                            }
+                            else
+                            {
+                                logger.Info($"[Main] GenerarEnvio => No se generó el envío automatico => Idenvio: {en[i].id_envio} IdEstadoEnvio:{en[i].id_estado_envio}");
+                            }
                         }
                     }
 
                     else if (en[i].id_estado_envio == 12 && en[i].programado == 1 && en[i].fecha_programado <= DateTime.Now && en[i].gatillado == 0)
                     {
-                        generarEnvio(en[i].id_envio, 1);
-                        ea.ActualizarEnvioGatillado(en[i].id_envio, 1);
-                        logger.Info($"[Main] GenerarEnvio => Gatillado el envio programado => Idenvio: {en[i].id_envio} IdEstadoEnvio:{en[i].id_estado_envio}");
+                        if (generarEnvio(en[i].id_envio, 1))
+                        {
+                            ea.ActualizarEnvioGatillado(en[i].id_envio, 1);
+                            logger.Info($"[Main] GenerarEnvio => Gatillado el envio programado => Idenvio: {en[i].id_envio} IdEstadoEnvio:{en[i].id_estado_envio}");
+                        }
+                        else
+                        {
+                            logger.Info($"[Main] GenerarEnvio => No se generó el envío programado => Idenvio: {en[i].id_envio} IdEstadoEnvio:{en[i].id_estado_envio}");
+                        }
                     }
                 }
                 // Console.ReadLine();
